@@ -1,2 +1,2 @@
 # install.sh
-A script for install deamons.
+A script for installing deamons.
