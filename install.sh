@@ -12,14 +12,17 @@ url="$4"
 
 [ "$sumalgo" = "sha256" -o "$sumalgo" = "sha1" -o "$sumalgo" = "md5" ] && sumalgo="$sumalgo"sum
 
-curl -Lo "/usr/bin/$name" "$url"
+tmp="$(mktemp)"
+curl -Lo "$tmp" "$url"
 
-"$sumalgo" "/usr/bin/$name" | grep "$sum" >/dev/null || {
-        rm -f "/usr/bin/$name"
+"$sumalgo" "$tmp" | grep "$sum" >/dev/null || {
+        rm -f "$tmp"
         echo "Checksum doesn't match!" >&2
         exit 2
 }
 
+systemctl stop "$name.service" >/dev/null 2>/dev/null
+mv -f "$tmp" "/usr/bin/$name"
 chmod +x "/usr/bin/$name"
 
 echo "[Unit]
